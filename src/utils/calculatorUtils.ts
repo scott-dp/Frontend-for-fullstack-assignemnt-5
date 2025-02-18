@@ -18,3 +18,12 @@ export async function getLoginApiResponse(username:string, password:string) {
   return apiResponse;
 
 }
+
+
+export async function getRegisterApiResponse(username:string, password:string) {
+  let apiResponse = await axios.post("http://localhost:8080/register", {
+    "username": username,
+    "password":password
+  })
+  return apiResponse;
+}

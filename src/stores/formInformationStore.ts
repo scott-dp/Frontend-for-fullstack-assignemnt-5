@@ -1,16 +1,14 @@
 import { defineStore } from 'pinia'
 
-export const useNameAndEmailStore = defineStore('token', {
+export const useUsernameStore = defineStore('token', {
   state: () => ({
-    name: '',
-    email: '',
+    username: '',
   }),
 
   actions: {
-    async saveNameAndMailInStore(name: string, email:string) {
+    saveUsernameInStore(username: string) {
       try {
-        this.name = name;
-        this.email = email;
+        this.username = username;
       } catch (err) {
         console.log(err)
       }

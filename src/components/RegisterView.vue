@@ -1,10 +1,26 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { getRegisterApiResponse } from '@/utils/calculatorUtils';
+import router from '@/router';
+import { useUsernameStore } from '@/stores/formInformationStore';
+
 const username = ref("");
 const password = ref("");
+const usernameStore = useUsernameStore();
 
-function handleRegisterClick() {
-    
+async function handleRegisterClick() {
+    let apiResponse;
+    try {
+        apiResponse = await getRegisterApiResponse(username.value, password.value);
+    } catch(AxiosError) {
+        alert("Register failed, try a new username")
+        return;
+    };
+
+    if (apiResponse.status == 200) {
+        router.push("/calculate");
+        usernameStore.saveUsernameInStore(username.value);
+    }
 }
 </script>
 

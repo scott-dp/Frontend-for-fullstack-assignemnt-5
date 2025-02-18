@@ -3,15 +3,23 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { getLoginApiResponse } from '@/utils/calculatorUtils';
 import router from '@/router';
+import { useUsernameStore } from '@/stores/formInformationStore';
 const username = ref("");
 const password = ref("");
+const usernameStore = useUsernameStore();
 
 async function handleLoginClick() {
-    let apiResponse = await getLoginApiResponse(username.value, password.value);
+    let apiResponse;
+    try {
+        apiResponse = await getLoginApiResponse(username.value, password.value);
+    } catch(AxiosError) {
+        alert("Login failed");
+        return;
+    }
     if (apiResponse.status == 200) {
         router.push("/calculate");
-    } else {
-        alert("Login failed");
+        usernameStore.saveUsernameInStore(username.value);
+        //SAVE usernmae TO pinia STORE
     }
 }
 </script>

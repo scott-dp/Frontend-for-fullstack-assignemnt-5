@@ -2,7 +2,9 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { roundNumber, getCalculationResponse } from '../utils/calculatorUtils';
-const display= defineModel<string>({required:true});
+import { useUsernameStore } from '@/stores/formInformationStore';
+const usernameStore = useUsernameStore();
+const display= ref("");
 var log = ref("");
 
 function appendToDisplay(event:Event) {
@@ -52,6 +54,7 @@ async function calculateResult() {
 
 <template>
   <div class="wrapper">
+    <h1 class="Large-grid-item">Hello {{ usernameStore.username }}</h1>
     <img class="Large-grid-item" src="../../public/calc.jpg" alt="Calculator" width="150" height="150">
     <h1 class="Large-grid-item">Calculator</h1>
     <textarea @keydown="handleKeydownEvent" v-model="display" class="Large-grid-item" width="200"></textarea>
