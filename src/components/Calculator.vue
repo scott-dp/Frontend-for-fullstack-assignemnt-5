@@ -6,6 +6,8 @@ import { useUsernameStore } from '@/stores/formInformationStore';
 const usernameStore = useUsernameStore();
 const display= ref("");
 var log = ref("");
+const usernameSaved = ref("");
+usernameSaved.value = usernameStore.username;
 
 function appendToDisplay(event:Event) {
   const target = event.target as HTMLButtonElement;
@@ -39,7 +41,7 @@ async function calculateResult() {
   
   let result;
   try {
-    let apiResponse = await getCalculationResponse(calculationAsString);
+    let apiResponse = await getCalculationResponse(calculationAsString, usernameSaved.value);
     result = apiResponse.data["result"];
   } catch (error) {
     alert("Invalid computation");
@@ -54,7 +56,7 @@ async function calculateResult() {
 
 <template>
   <div class="wrapper">
-    <h1 class="Large-grid-item">Hello {{ usernameStore.username }}</h1>
+    <h1 class="Large-grid-item">Hello {{ usernameSaved }}</h1>
     <img class="Large-grid-item" src="../../public/calc.jpg" alt="Calculator" width="150" height="150">
     <h1 class="Large-grid-item">Calculator</h1>
     <textarea @keydown="handleKeydownEvent" v-model="display" class="Large-grid-item" width="200"></textarea>

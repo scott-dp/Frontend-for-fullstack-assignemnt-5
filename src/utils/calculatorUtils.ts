@@ -1,7 +1,9 @@
 import axios from 'axios';
-export async function getCalculationResponse(calculationAsString:string) {
+export async function getCalculationResponse(calculationAsString:string, username:string) {
+  console.log("Username " + username);
   let apiResponse = await axios.post("http://localhost:8080/calculate", {
-    "calculation" : calculationAsString
+    "calculation" : calculationAsString,
+    "username" : username
   });
   return apiResponse;
 }
