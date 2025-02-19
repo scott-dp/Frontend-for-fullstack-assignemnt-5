@@ -1,18 +1,38 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import axios from 'axios';
-import { roundNumber, getCalculationResponse } from '../utils/calculatorUtils';
-import { useUsernameStore } from '@/stores/formInformationStore';
+import { roundNumber, getCalculationResponse, getLatestCalculationsResponse } from '../utils/calculatorUtils';
+import { useUsernameStore } from '@/stores/usernameStore';
+
 const usernameStore = useUsernameStore();
 const display= ref("");
 var log = ref("");
+var latestCalculations = ref("");
 const usernameSaved = ref("");
+
 usernameSaved.value = usernameStore.username;
 
 function appendToDisplay(event:Event) {
   const target = event.target as HTMLButtonElement;
   display.value += target.innerHTML;
 }
+
+async function get10LatestCalculations() {
+  latestCalculations.value="";
+  let result;
+  try {
+    let apiResponse = await getLatestCalculationsResponse(usernameSaved.value);
+    result = apiResponse.data;
+  }catch(error) {
+    console.error(error);
+    return;
+  }
+  for (let calculation of result) {
+    latestCalculations.value += calculation["calculation"];
+    latestCalculations.value += "\n";
+  }
+}
+
+get10LatestCalculations();
 
 function handleKeydownEvent(event:KeyboardEvent){
   event.preventDefault();
@@ -51,6 +71,7 @@ async function calculateResult() {
   result = roundNumber(result, 2);//Round result to two decimal points
   let resultString = calculationAsString + " = " + result;
   log.value = resultString + "\n" + log.value;
+  get10LatestCalculations();
 }
 </script>
 
@@ -83,6 +104,10 @@ async function calculateResult() {
       <h3>Logg:</h3>
       <p>{{ log }}</p>
     </div>
+  </div>
+  <div id="earlierCalculations">
+    <h3>10 latest calcualtions</h3>
+    <p>{{ latestCalculations }}</p>
   </div>
 </template>
 

@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { getRegisterApiResponse } from '@/utils/calculatorUtils';
 import router from '@/router';
-import { useUsernameStore } from '@/stores/formInformationStore';
+import { useUsernameStore } from '@/stores/usernameStore';
 
 const username = ref("");
 const password = ref("");

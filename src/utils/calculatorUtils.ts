@@ -29,3 +29,8 @@ export async function getRegisterApiResponse(username:string, password:string) {
   })
   return apiResponse;
 }
+
+export async function getLatestCalculationsResponse(username:string) {
+  let apiResponse = await axios.get("http://localhost:8080/calculations/" + username);
+  return apiResponse;
+}
