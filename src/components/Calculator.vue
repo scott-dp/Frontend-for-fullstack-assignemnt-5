@@ -1,15 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { roundNumber, getCalculationResponse, getLatestCalculationsResponse } from '../utils/calculatorUtils';
-import { useUsernameStore } from '@/stores/usernameStore';
+import { onMounted, ref, reactive } from 'vue';
+import { roundNumber, getCalculationResponse, getLatestCalculationsResponse, getUserInfo } from '../utils/calculatorUtils';
+import { useTokenStore } from '@/stores/tokenStore';
 
-const usernameStore = useUsernameStore();
+const tokenStore = useTokenStore();
 const display= ref("");
 var log = ref("");
 var latestCalculations = ref("");
-const usernameSaved = ref("");
+let userInfo = reactive({
+  username:"",
+});
 
-usernameSaved.value = usernameStore.username;
+onMounted( async () => {
+  if (tokenStore.jwtToken == "") {
+    console.log("Unauthorized access");
+  } else {
+    console.log("token exists, may not be valid")
+    let response = await getUserInfo(tokenStore.username, tokenStore.jwtToken);
+    userInfo.username = response.data;
+  }
+});
 
 function appendToDisplay(event:Event) {
   const target = event.target as HTMLButtonElement;
@@ -20,7 +30,7 @@ async function get10LatestCalculations() {
   latestCalculations.value="";
   let result;
   try {
-    let apiResponse = await getLatestCalculationsResponse(usernameSaved.value);
+    let apiResponse = await getLatestCalculationsResponse(tokenStore.username, tokenStore.jwtToken);
     result = apiResponse.data;
   }catch(error) {
     console.error(error);
@@ -52,7 +62,7 @@ function clearTextArea() {
   display.value =""
 }
 
-function deleteLastCharacterInDisplay() {
+function deleteLastCharacterInDisplay() { 
   display.value = display.value.slice(0, display.value.length-1);
 }
 
@@ -61,7 +71,7 @@ async function calculateResult() {
   
   let result;
   try {
-    let apiResponse = await getCalculationResponse(calculationAsString, usernameSaved.value);
+    let apiResponse = await getCalculationResponse(calculationAsString, tokenStore.username, tokenStore.jwtToken);
     result = apiResponse.data["result"];
   } catch (error) {
     alert("Invalid computation");
@@ -76,8 +86,9 @@ async function calculateResult() {
 </script>
 
 <template>
+  <div v-if="userInfo.username">
   <div class="wrapper">
-    <h1 class="Large-grid-item">Hello {{ usernameSaved }}</h1>
+    <h1 class="Large-grid-item">Hello {{ userInfo.username }}</h1>
     <img class="Large-grid-item" src="../../public/calc.jpg" alt="Calculator" width="150" height="150">
     <h1 class="Large-grid-item">Calculator</h1>
     <textarea @keydown="handleKeydownEvent" v-model="display" class="Large-grid-item" width="200"></textarea>
@@ -109,6 +120,11 @@ async function calculateResult() {
     <h3>10 latest calcualtions</h3>
     <p>{{ latestCalculations }}</p>
   </div>
+</div>
+
+<div v-if="!userInfo.username">
+  <h1>Unauthorized access!</h1>
+</div>
 </template>
 
 <style scoped>

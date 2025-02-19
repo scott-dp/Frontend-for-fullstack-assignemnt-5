@@ -1,25 +1,19 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { ref } from 'vue';
-import { getLoginApiResponse } from '@/utils/calculatorUtils';
 import router from '@/router';
-import { useUsernameStore } from '@/stores/usernameStore';
+import { useTokenStore } from '@/stores/tokenStore';
+
 const username = ref("");
 const password = ref("");
-const usernameStore = useUsernameStore();
+const tokenStore = useTokenStore();
 
 async function handleLoginClick() {
-    let apiResponse;
-    try {
-        apiResponse = await getLoginApiResponse(username.value, password.value);
-    } catch(AxiosError) {
-        alert("Login failed");
-        return;
-    }
-    if (apiResponse.status == 200) {
+    await tokenStore.getTokenAndSaveInStore(username.value, password.value);
+    if (tokenStore.jwtToken != "") {
         router.push("/calculate");
-        usernameStore.saveUsernameInStore(username.value);
-        //SAVE usernmae TO pinia STORE
+    } else {
+        alert("login failed");
     }
 }
 </script>
@@ -33,7 +27,6 @@ async function handleLoginClick() {
     <input class="loginElement" v-model="password">
     <button class="loginElement" @click="handleLoginClick" id="loginButton">Login</button>
 </div>
-<RouterLink to="/register">Dont have an account? Register here</RouterLink>
 </template>
 
 <style scoped>
